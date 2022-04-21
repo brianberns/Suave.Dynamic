@@ -20,9 +20,14 @@ module Manager =
                 filePath
                     |> Path.GetFullPath
                     |> Assembly.LoadFile
-            for typ in assembly.GetTypes() do
-                printfn "%O" typ
-                for prop in typ.GetProperties(BindingFlags.Static ||| BindingFlags.Public) do
-                    printfn "   %s: %O" prop.Name (prop.PropertyType = typeof<WebPart>)
+            let prop =
+                seq {
+                    for typ in assembly.GetTypes() do
+                        for prop in typ.GetProperties(BindingFlags.Static ||| BindingFlags.Public) do
+                            if prop.PropertyType = typeof<WebPart> then
+                                yield prop
+                } |> Seq.exactlyOne
+            let part = prop.GetMethod.Invoke(null, Array.empty) :?> WebPart
+            ()
         
         Successful.OK "Hello World!"
