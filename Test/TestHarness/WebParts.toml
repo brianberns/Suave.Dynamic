@@ -1,7 +1,7 @@
 ﻿[web_part.one]
-file_path = '..\..\..\TestWebPart1\bin\Debug\net6.0\TestWebPart1.dll'
+file_path = '..\..\..\..\TestWebPart1\bin\Debug\net6.0\TestWebPart1.dll'
 web_path = "/one"
 
 [web_part.two]
-file_path = '..\..\..\TestWebPart2\bin\Debug\net6.0\TestWebPart2.dll'
+file_path = '..\..\..\..\TestWebPart2\bin\Debug\net6.0\TestWebPart2.dll'
 web_path = "/two"
