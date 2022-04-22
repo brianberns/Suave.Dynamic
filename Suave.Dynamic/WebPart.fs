@@ -10,15 +10,19 @@ open Suave.Operators
 
 open Tommy
 
+/// Definition of a dynamic web part.
 type WebPartDefinition =
     {
+        /// Web path prefix routed to be routed to the web part.
         WebPath : string
+
+        /// Path to assembly that contains the web part.
         AssemblyPath : string
     }
 
 module WebPartDefinition =
 
-    /// Extracts a web part definition from the given table.
+    /// Extracts a dynamic web part definition from the given table.
     let fromTable (table : TomlTable) =
         {
             WebPath = table["web_path"].AsString.Value
