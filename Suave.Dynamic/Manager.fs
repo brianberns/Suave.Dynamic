@@ -31,7 +31,16 @@ module Manager =
                                 if prop.PropertyType = typeof<WebPart> then
                                     yield prop
                     } |> Seq.exactlyOne
-                let part = prop.GetMethod.Invoke(null, Array.empty) :?> WebPart
-                yield path webPath >=> part
+                let innerPart = prop.GetMethod.Invoke(null, Array.empty) :?> WebPart
+                let part =
+                    pathStarts webPath
+                        >=> fun ctx ->
+                            let rawPath =
+                                ctx.request.path.Substring(webPath.Length)
+                                    |> System.Net.WebUtility.UrlEncode
+                            let req =
+                                { ctx.request with rawPath = rawPath }
+                            innerPart { ctx with request = req }
+                yield part
             yield RequestErrors.NOT_FOUND "Found no handlers."
         ]
