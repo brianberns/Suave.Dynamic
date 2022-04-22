@@ -18,6 +18,8 @@ type WebPartDefinition =
 
         /// Path to assembly that contains the web part.
         AssemblyPath : string
+
+        TypeFullNameOpt : Option<string>
     }
 
 module WebPartDefinition =
@@ -27,23 +29,34 @@ module WebPartDefinition =
         {
             WebPath = table["web_path"].AsString.Value
             AssemblyPath = table["assembly_path"].AsString.Value
+            TypeFullNameOpt =
+                match table.TryGetNode("type_full_name") with
+                    | true, node -> Some node.AsString.Value
+                    | _ -> None
         }
 
 module WebPart =
 
     /// Creates a dynamic web part by invoking the given assembly.
-    let private createWebPart assemblyPath =
+    let private createWebPart webPartDef =
 
             // load assembly
         let assembly =
-            assemblyPath
+            webPartDef.AssemblyPath
                 |> Path.GetFullPath
                 |> Assembly.LoadFile
+
+            // extract candidate type(s) from assembly
+        let types =
+            match webPartDef.TypeFullNameOpt with
+                | Some fullName ->
+                    [| assembly.GetType(fullName, true) |]
+                | None -> assembly.GetTypes()
 
             // create web part
         let prop =
             seq {
-                for typ in assembly.GetTypes() do
+                for typ in types do
                     let properties =
                         typ.GetProperties(BindingFlags.Static ||| BindingFlags.Public)
                     for prop in properties do
@@ -107,7 +120,7 @@ module WebPart =
                 let webPartDef =
                     partsNode[key].AsTable
                         |> WebPartDefinition.fromTable
-                let webPart = createWebPart webPartDef.AssemblyPath
+                let webPart = createWebPart webPartDef
 
                     // wrap inner part
                 let webPath = webPartDef.WebPath
