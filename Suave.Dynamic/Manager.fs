@@ -78,6 +78,4 @@ module Manager =
                     // wrap inner part
                 yield pathStarts webPath
                     >=> wrapWebPart webPath innerPart
-
-            yield RequestErrors.NOT_FOUND "Found no handlers."
         ]

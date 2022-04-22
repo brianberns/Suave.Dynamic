@@ -6,10 +6,12 @@ open Suave.Operators
 
 let app =
     let logger = Targets.create LogLevel.Info [||]
-    Manager.create "WebParts.toml"
-        >=> logWithLevelStructured
-            LogLevel.Info
-            logger
-            logFormatStructured
+    choose [
+        Manager.create "WebParts.toml"
+        RequestErrors.NOT_FOUND "Found no handlers."
+    ] >=> logWithLevelStructured
+        LogLevel.Info
+        logger
+        logFormatStructured
 
 startWebServer defaultConfig app
