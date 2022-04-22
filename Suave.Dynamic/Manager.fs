@@ -31,6 +31,31 @@ module Manager =
             } |> Seq.exactlyOne
         prop.GetMethod.Invoke(null, Array.empty) :?> WebPart
 
+    let private trimPath (webPath : string) (ctx : HttpContext) =
+        let rawPath =
+            ctx.request.path.Substring(webPath.Length)
+                |> String.split('/')
+                |> Seq.map WebUtility.UrlEncode
+                |> String.concat "/"
+        let req =
+            { ctx.request with rawPath = rawPath }
+        { ctx with request = req }
+
+    let private wrapPart webPath (webPart : WebPart) : WebPart =
+        fun ctx ->
+            async {
+                    // invoke inner part with trimmed path
+                let! ctxOpt =
+                    ctx
+                        |> trimPath webPath
+                        |> webPart
+
+                    // restore original request
+                return ctxOpt
+                    |> Option.map (fun ctx' ->
+                        { ctx' with request = ctx.request })
+            }
+
     let create tomlPath =
 
             // find dynamic web part configs
@@ -49,24 +74,9 @@ module Manager =
                     // create inner part
                 let innerPart = createWebPart assembly
 
-                    // combine
-                let part =
-                    pathStarts webPath
-                        >=> fun ctx ->
-                            let rawPath =
-                                ctx.request.path.Substring(webPath.Length)
-                                    |> String.split('/')
-                                    |> Seq.map WebUtility.UrlEncode
-                                    |> String.concat "/"
-                            let req =
-                                { ctx.request with rawPath = rawPath }
-                            async {
-                                let! ctxOpt = innerPart { ctx with request = req }
-                                return ctxOpt
-                                    |> Option.map (fun ctx' ->
-                                        { ctx' with request = ctx.request })   // restore original request
-                            }
-                yield part
+                    // wrap inner part
+                yield pathStarts webPath
+                    >=> wrapPart webPath innerPart
 
             yield RequestErrors.NOT_FOUND "Found no handlers."
         ]
