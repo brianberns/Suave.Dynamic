@@ -41,7 +41,7 @@ module Manager =
             { ctx.request with rawPath = rawPath }
         { ctx with request = req }
 
-    let private wrapPart webPath (webPart : WebPart) : WebPart =
+    let private wrapWebPart webPath (webPart : WebPart) : WebPart =
         fun ctx ->
             async {
                     // invoke inner part with trimmed path
@@ -59,9 +59,10 @@ module Manager =
     let create tomlPath =
 
             // find dynamic web part configs
-        use reader = new StreamReader(tomlPath : string)
-        let table = TOML.Parse(reader)
-        let partsNode = table["web_part"]
+        let partsNode =
+            use reader = new StreamReader(tomlPath : string)
+            let table = TOML.Parse(reader)
+            table["web_part"]
 
         choose [
             for key in partsNode.Keys do
@@ -76,7 +77,7 @@ module Manager =
 
                     // wrap inner part
                 yield pathStarts webPath
-                    >=> wrapPart webPath innerPart
+                    >=> wrapWebPart webPath innerPart
 
             yield RequestErrors.NOT_FOUND "Found no handlers."
         ]
