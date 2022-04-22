@@ -1,5 +1,6 @@
 ﻿namespace Suave.Dynamic
 
+open System
 open System.IO
 open System.Net
 open System.Reflection
@@ -19,24 +20,41 @@ module WebPart =
                 |> Path.GetFullPath
                 |> Assembly.LoadFile
 
-            // extract candidate type(s) from assembly
+            // extract candidate types from assembly
         let types =
             match webPartDef.TypeFullNameOpt with
                 | Some fullName ->
                     [| assembly.GetType(fullName, true) |]
                 | None -> assembly.GetTypes()
 
+            // extract candidate property(ies) from types
+        let properties =
+            let mapping =
+                match webPartDef.PropertyNameOpt with
+                    | Some name ->
+                        fun (typ : Type) ->
+                            typ.GetProperty(name, typeof<WebPart>)
+                                |> Seq.singleton
+                    | None ->
+                        fun (typ : Type) ->
+                            typ.GetProperties(
+                                BindingFlags.Static ||| BindingFlags.Public)
+                                |> Seq.where (fun prop ->
+                                    prop.PropertyType = typeof<WebPart>)
+            types
+                |> Seq.collect mapping
+                |> Seq.toArray
+
+            // choose final property
+        let property =
+            match properties.Length with
+                | 1 -> properties |> Array.exactlyOne
+                | 0 -> failwith $"No candidate properties found in {webPartDef.AssemblyPath}"
+                | _ -> failwith $"Multiple candidate properties found in {webPartDef.AssemblyPath}: {properties}"
+
             // create web part
-        let prop =
-            seq {
-                for typ in types do
-                    let properties =
-                        typ.GetProperties(BindingFlags.Static ||| BindingFlags.Public)
-                    for prop in properties do
-                        if prop.PropertyType = typeof<WebPart> then
-                            yield prop
-            } |> Seq.exactlyOne
-        prop.GetMethod.Invoke(null, Array.empty) :?> WebPart
+        property.GetMethod.Invoke(null, Array.empty)
+            :?> WebPart
 
     /// Removes the given web path prefix from the start of the given
     /// context's path.
