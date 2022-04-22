@@ -6,7 +6,7 @@ open Suave.Operators
 let app =
     let logger = Targets.create LogLevel.Info [||]
     choose [
-        Dynamic.WebPart.create "WebParts.toml"
+        Dynamic.WebPart.fromToml "WebParts.toml"
         RequestErrors.NOT_FOUND "Found no handlers."
     ] >=> logWithLevelStructured
         LogLevel.Info

@@ -6,3 +6,4 @@ web_path = "/one"
 assembly_path = '..\..\..\..\TestWebPart2\bin\Debug\net6.0\TestWebPart2.dll'
 web_path = "/two"
 type_full_name = "TestWebPart2.WebPart"
+property_name = "app"

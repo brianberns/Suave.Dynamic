@@ -19,6 +19,9 @@ type WebPartDefinition =
         /// Path to assembly that contains the web part.
         AssemblyPath : string
 
+        /// Full name of type that contains the web part. If no
+        /// name is specified, all types in the assembly will be
+        /// considered.
         TypeFullNameOpt : Option<string>
     }
 
@@ -34,6 +37,17 @@ module WebPartDefinition =
                     | true, node -> Some node.AsString.Value
                     | _ -> None
         }
+
+    /// Reads dynamic web part definitions from the given TOML file.
+    let read tomlPath =
+        let node =
+            use reader = new StreamReader(tomlPath : string)
+            let table = TOML.Parse(reader)
+            table["web_part"]
+        [|
+            for key in node.Keys do
+                yield node[key].AsTable |> fromTable
+        |]
 
 module WebPart =
 
@@ -104,26 +118,22 @@ module WebPart =
                         { ctx' with request = ctx.request })
             }
 
-    /// Creates a dynamic web part.
-    let create tomlPath =
-
-            // find dynamic web part configs
-        let partsNode =
-            use reader = new StreamReader(tomlPath : string)
-            let table = TOML.Parse(reader)
-            table["web_part"]
-
+    /// Creates a dynamic web part from the given definitions.
+    let fromDefinitions webPartDefs =
         choose [
-            for key in partsNode.Keys do
+            for webPartDef in webPartDefs do
 
                     // create dynamic web part
-                let webPartDef =
-                    partsNode[key].AsTable
-                        |> WebPartDefinition.fromTable
                 let webPart = createWebPart webPartDef
 
-                    // wrap inner part
+                    // wrap dynamic part
                 let webPath = webPartDef.WebPath
                 yield pathStarts webPath
                     >=> wrapWebPart webPath webPart
         ]
+
+    /// Creates a dynamic web part from the given TOML file.
+    let fromToml tomlPath =
+        tomlPath
+            |> WebPartDefinition.read
+            |> fromDefinitions
