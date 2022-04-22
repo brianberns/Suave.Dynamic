@@ -30,7 +30,7 @@ module WebPart =
                     [| assembly.GetType(fullName, true) |]
                 | None -> assembly.GetTypes()
 
-            // extract candidate property(ies) from types
+            // extract candidate properties from types
         let properties =
             let mapping =
                 match webPartDef.PropertyNameOpt with
