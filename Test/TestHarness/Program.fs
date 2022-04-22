@@ -4,6 +4,7 @@ open Suave.Logging
 open Suave.Operators
 
 try
+
     let app =
         let logger = Targets.create LogLevel.Info [||]
         choose [
@@ -15,5 +16,6 @@ try
             logFormatStructured
 
     startWebServer defaultConfig app
+
 with ex ->
     printfn $"{ex.Message}"
