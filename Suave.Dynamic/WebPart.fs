@@ -15,10 +15,13 @@ module WebPart =
     let private createWebPart webPartDef =
 
             // load assembly
+        let assemblyPath = webPartDef.AssemblyPath
+        let loadContext = PluginLoadContext(assemblyPath)
         let assembly =
-            webPartDef.AssemblyPath
-                |> Path.GetFullPath
-                |> Assembly.LoadFile
+            assemblyPath
+                |> Path.GetFileNameWithoutExtension
+                |> AssemblyName
+                |> loadContext.LoadFromAssemblyName
 
             // extract candidate types from assembly
         let types =
@@ -33,8 +36,11 @@ module WebPart =
                 match webPartDef.PropertyNameOpt with
                     | Some name ->
                         fun (typ : Type) ->
-                            typ.GetProperty(name, typeof<WebPart>)
-                                |> Seq.singleton
+                            let property =
+                                typ.GetProperty(name, typeof<WebPart>)
+                            if isNull property then
+                                failwith $"No such property: {typ.Name}.{name}"
+                            Seq.singleton property
                     | None ->
                         fun (typ : Type) ->
                             typ.GetProperties(
