@@ -1,5 +1,4 @@
 ﻿open Suave
-open Suave.Dynamic
 open Suave.Filters
 open Suave.Logging
 open Suave.Operators
@@ -7,7 +6,7 @@ open Suave.Operators
 let app =
     let logger = Targets.create LogLevel.Info [||]
     choose [
-        Manager.create "WebParts.toml"
+        Dynamic.WebPart.create "WebParts.toml"
         RequestErrors.NOT_FOUND "Found no handlers."
     ] >=> logWithLevelStructured
         LogLevel.Info
