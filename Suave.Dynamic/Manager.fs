@@ -37,7 +37,9 @@ module Manager =
                         >=> fun ctx ->
                             let rawPath =
                                 ctx.request.path.Substring(webPath.Length)
-                                    |> System.Net.WebUtility.UrlEncode
+                                    |> String.split('/')
+                                    |> Seq.map System.Net.WebUtility.UrlEncode
+                                    |> String.concat "/"
                             let req =
                                 { ctx.request with rawPath = rawPath }
                             innerPart { ctx with request = req }
