@@ -5,14 +5,17 @@ open Suave.Filters
 open Suave.Operators
 open Suave.Successful
 
+open Tommy
+
 open MathNet.Numerics
 
 module WebPart =
 
-    let app =
+    let createApp (tomlTable : TomlTable) =
         let two = BigRational.FromInt 2
+        let extra = tomlTable["extra"].AsString
         GET >=>
             choose [
-                path "/hello" >=> OK $"Hello {two}"
-                path "/goodbye" >=> OK $"Goodbye {two}"
+                path "/hello" >=> OK $"Hello {two} {extra}"
+                path "/goodbye" >=> OK $"Goodbye {two} {extra}"
             ]

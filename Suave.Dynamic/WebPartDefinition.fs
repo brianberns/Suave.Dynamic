@@ -26,10 +26,10 @@ type WebPartDefinition =
         /// considered.
         TypeFullNameOpt : Option<string>
 
-        /// Name of static property that contains the web part. If
-        /// no name is specified, all static properties in the type
+        /// Name of static member that contains the web part. If
+        /// no name is specified, all static members in the type
         /// will be considered.
-        PropertyNameOpt : Option<string>
+        MemberNameOpt : Option<string>
     }
 
 module WebPartDefinition =
@@ -44,20 +44,20 @@ module WebPartDefinition =
                     |> TomlTable.tryGetNode "type_full_name"
                     |> Option.map (fun node ->
                         node.AsString.Value)
-            PropertyNameOpt =
+            MemberNameOpt =
                 table
-                    |> TomlTable.tryGetNode "property_name"
+                    |> TomlTable.tryGetNode "member_name"
                     |> Option.map (fun node ->
                         node.AsString.Value)
         }
 
     /// Reads dynamic web part definitions from the given TOML file.
-    let read tomlPath =
+    let getWebPartDefTables tomlPath =
         let node =
             use reader = new StreamReader(tomlPath : string)
             let table = TOML.Parse(reader)
             table["web_part"]
         [|
             for key in node.Keys do
-                yield node[key].AsTable |> fromTable
+                yield node[key].AsTable
         |]
