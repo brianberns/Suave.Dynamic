@@ -18,6 +18,12 @@ module Option =
             |> Option.map Seq.singleton
             |> Option.defaultValue Seq.empty
 
+module String =
+
+    /// Concatenates the given strings.
+    let join (separator : string) (strings : seq<string>) =
+        String.Join(separator, strings)
+
 module WebPart =
 
     /// Extracts candidate types.
@@ -62,10 +68,14 @@ module WebPart =
                             |> Option.toSeq
                 | None ->
                     fun (typ : Type) ->
-                        typ.GetMethods(
-                            BindingFlags.Static ||| BindingFlags.Public)
+                        typ.GetMethods(bindingFlags)
                             |> Seq.where (fun meth ->
-                                meth.ReturnType = typeof<WebPart>)
+                                meth.GetParameters()
+                                    |> Seq.tryExactlyOne
+                                    |> Option.map (fun param ->
+                                        param.ParameterType = typeof<TomlTable>)
+                                    |> Option.defaultValue false
+                                    && meth.ReturnType = typeof<WebPart>)
         types
             |> Seq.collect mapping
             |> Seq.toArray
@@ -89,14 +99,24 @@ module WebPart =
                 let property =
                     properties |> Array.exactlyOne
                 property.GetMethod.Invoke(null, Array.empty)
+                    :?> WebPart
             | 0, 1, Some tomlTable ->
                 let method =
                     methods |> Array.exactlyOne
                 method.Invoke(null, [| tomlTable |])
+                    :?> WebPart
             | 0, 1, None -> failwith "Unexpected"
-            | 0, 0, _ -> failwith $"No candidate members found in {webPartDef.AssemblyPath}"
-            | _ -> failwith $"Multiple candidate members found in {webPartDef.AssemblyPath}"
-            :?> WebPart
+            | 0, 0, _ ->
+                failwith $"No candidate members found in {webPartDef.AssemblyPath}"
+            | _ ->
+                let memberNames =
+                    seq {
+                        for property in properties do
+                            yield $"Property {property.Name}"
+                        for method in methods do
+                            yield $"Method {method.Name}"
+                    } |> String.join ", "
+                failwith $"Multiple candidate members found in {webPartDef.AssemblyPath}: {memberNames}"
 
     /// Removes the given web path prefix from the start of the given
     /// context's path.

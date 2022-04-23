@@ -16,7 +16,9 @@
     <PackageReference Include="Suave" Version="2.6.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Tommy" Version="3.1.2" />
+    <PackageReference Include="Tommy" Version="3.1.2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
     <PackageReference Update="FSharp.Core">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
