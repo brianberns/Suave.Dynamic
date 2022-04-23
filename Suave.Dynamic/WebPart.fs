@@ -14,17 +14,10 @@ module WebPart =
     /// Creates a dynamic web part by invoking the given assembly.
     let private createWebPart webPartDef =
 
-            // load assembly
-        let assemblyPath = webPartDef.AssemblyPath
-        let loadContext = PluginLoadContext(assemblyPath)
-        let assembly =
-            assemblyPath
-                |> Path.GetFileNameWithoutExtension
-                |> AssemblyName
-                |> loadContext.LoadFromAssemblyName
-
             // extract candidate types from assembly
         let types =
+            let assembly =
+                PluginLoadContext.load webPartDef.AssemblyPath
             match webPartDef.TypeFullNameOpt with
                 | Some fullName ->
                     [| assembly.GetType(fullName, true) |]
