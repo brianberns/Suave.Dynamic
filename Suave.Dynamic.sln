@@ -11,6 +11,11 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TestWebPart1", "Test\TestWe
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TestWebPart2", "Test\TestWebPart2\TestWebPart2.fsproj", "{4D09B1E6-FA94-48D5-86EC-D7DFF150C5EB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{067C4E35-7672-447B-BD6E-8F0C1C367F14}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

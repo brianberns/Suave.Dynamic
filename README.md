@@ -93,3 +93,41 @@ The configuration file tells Suave.Dynamic where to find the dynamic web parts:
 If `type_full_name` or `property_name` are omitted, Suave.Dynamic will search the assembly for a type that contains a static property of type `WebPart`.
 
 We can then start the web server and browse to a URL such as http://localhost:8080/one/hello. The response is "Hello 1", as expected. Note, however, that the request that `WebPart1` sees is just `/hello`, rather than `/one/hello`. This allows `WebPart2` to be loaded as well, and respond to requests at `/two/hello`, without any conflict between the two web parts.
+
+# Building a dynamic web part
+
+Dynamic web parts must be built carefully, so they can be successfully loaded at runtime. This requires the `.fsproj` file to contain the following settings:
+
+* Set `EnableDynamicLoading` to `true`. This copies all of the project's dependencies to its build directory.
+* Set `ExcludeAssets` to `runtime` for both Suave and FSharp.Core. This prevents those particular assemblies from being copied to the build directory, and being loaded incompatibly by `Suave.Dynamic`.
+
+A typical `.fsproj` file for a dynamic web part will then look something like this:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="WebPart.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics.FSharp" Version="5.0.0" />
+    <PackageReference Include="Suave" Version="2.6.2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Update="FSharp.Core">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
+```
+
+See the article [Create a .NET Core application with plugins](https://docs.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support) for details.
