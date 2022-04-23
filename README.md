@@ -1,4 +1,4 @@
-# Sauve.Dynamic
+# Suave.Dynamic
 
 Suave.Dynamic is a [Suave](https://suave.io) web part that can load other web parts dynamically and then route requests to them. This allows a single Suave web server to host multiple independent apps, each of which acts as the root of its own virtual directory.
 
