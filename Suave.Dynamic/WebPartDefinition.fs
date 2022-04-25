@@ -16,9 +16,13 @@ module TomlTable =
 type WebPartDefinition =
     {
         /// Web path prefix routed to be routed to the web part.
+        /// E.g. "/MyWebPart".
         WebPath : string
 
-        /// Path to assembly that contains the web part.
+        /// Path to assembly that contains the web part. If this is
+        /// a relative path, it will be resolved using the current
+        /// directory, which might not be the same as the directory
+        /// that contains the web server's binaries.
         AssemblyPath : string
 
         /// Full name of type that contains the web part. If no
