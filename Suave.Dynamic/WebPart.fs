@@ -125,6 +125,9 @@ module WebPart =
                 |> String.split('/')
                 |> Seq.map WebUtility.UrlEncode
                 |> String.concat "/"
+                |> function
+                    | "" -> "/"   // map "/MyWebPart" to "/MyWebPart/"
+                    | path -> path
 
             // construct modified context
         let trimmedCtx =
@@ -132,7 +135,10 @@ module WebPart =
                 request =
                     { ctx.request with
                         rawPath = rawPath } }
-        assert(ctx.request.path = pathPrefix + trimmedCtx.request.path)
+        assert(
+            let lhs = ctx.request.path + (if trimmedPath = "" then "/" else "")
+            let rhs = pathPrefix + trimmedCtx.request.path
+            lhs = rhs)
         trimmedCtx
 
     /// Wraps the given web part for invocation with a trimmed path.

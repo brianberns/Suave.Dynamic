@@ -16,6 +16,7 @@ module WebPart =
         let extra = tomlTable["extra"].AsString
         GET >=>
             choose [
+                path "/" >=> OK $"Root {two}"
                 path "/hello" >=> OK $"Hello {two} {extra}"
                 path "/goodbye" >=> OK $"Goodbye {two} {extra}"
             ]
