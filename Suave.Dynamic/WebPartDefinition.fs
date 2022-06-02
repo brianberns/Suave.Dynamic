@@ -15,7 +15,7 @@ module TomlTable =
 /// Definition of a dynamic web part.
 type WebPartDefinition =
     {
-        /// Web path prefix routed to be routed to the web part.
+        /// Web path prefix to be routed to the web part.
         /// E.g. "/MyWebPart".
         WebPath : string
 

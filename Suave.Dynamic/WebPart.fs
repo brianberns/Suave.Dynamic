@@ -18,12 +18,6 @@ module Option =
             |> Option.map Seq.singleton
             |> Option.defaultValue Seq.empty
 
-module String =
-
-    /// Concatenates the given strings.
-    let join (separator : string) (strings : seq<string>) =
-        String.Join(separator, strings)
-
 module WebPart =
 
     /// Extracts candidate types.
@@ -115,7 +109,7 @@ module WebPart =
                             yield $"Property {property.Name}"
                         for method in methods do
                             yield $"Method {method.Name}"
-                    } |> String.join ", "
+                    } |> String.concat ", "
                 failwith $"Multiple candidate members found in {webPartDef.AssemblyPath}: {memberNames}"
 
     /// Removes the given web path prefix from the start of the given
