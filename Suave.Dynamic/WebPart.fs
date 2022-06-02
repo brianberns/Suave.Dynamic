@@ -165,8 +165,12 @@ module WebPart =
                     // create dynamic web part
                 let webPart = createWebPart webPartDef tomlTableOpt
 
-                    // wrap dynamic part
+                    // redirect to root? (e.g. "/MyWebPart" -> "/MyWebPart/")
                 let webPath = webPartDef.WebPath
+                yield path webPath
+                    >=> Redirection.redirect (webPath + "/")
+
+                    // wrap dynamic web part
                 yield pathStarts webPath
                     >=> wrapWebPart webPath webPart
         ]
