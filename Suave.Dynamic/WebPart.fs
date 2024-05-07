@@ -33,6 +33,15 @@ module WebPart =
     let private bindingFlags =
         BindingFlags.Static ||| BindingFlags.Public
 
+    let private equalTypes (typeA : Type) (typeB : Type) =
+        if typeA <> typeB
+            && typeA.AssemblyQualifiedName = typeB.AssemblyQualifiedName
+            && typeA.Assembly.Location <> typeB.Assembly.Location then
+            printfn "Warning: Assembly mismatch:"
+            printfn $"   {typeA.Assembly.Location}"
+            printfn $"   {typeB.Assembly.Location}"
+        typeA = typeB
+
     /// Extracts candidate properites from the given types.
     let private getCandidateProperties webPartDef types =
         let mapping =
@@ -46,7 +55,9 @@ module WebPart =
                     fun (typ : Type) ->
                         typ.GetProperties(bindingFlags)
                             |> Seq.where (fun prop ->
-                                prop.PropertyType = typeof<WebPart>)
+                                equalTypes 
+                                    prop.PropertyType
+                                    typeof<WebPart>)
         types
             |> Seq.collect mapping
             |> Seq.toArray
@@ -67,9 +78,13 @@ module WebPart =
                                 meth.GetParameters()
                                     |> Seq.tryExactlyOne
                                     |> Option.map (fun param ->
-                                        param.ParameterType = typeof<TomlTable>)
+                                        equalTypes
+                                            param.ParameterType
+                                            typeof<TomlTable>)
                                     |> Option.defaultValue false
-                                    && meth.ReturnType = typeof<WebPart>)
+                                    && equalTypes
+                                        meth.ReturnType
+                                        typeof<WebPart>)
         types
             |> Seq.collect mapping
             |> Seq.toArray
