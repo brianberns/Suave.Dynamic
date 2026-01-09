@@ -73,11 +73,11 @@ This loads the dynamic web parts using the information in a [TOML](https://toml.
 
 ```toml
 [web_part.one]
-assembly_path = '..\..\..\..\TestWebPart1\bin\Debug\net8.0\TestWebPart1.dll'
+assembly_path = '..\..\..\..\TestWebPart1\bin\Debug\net10.0\TestWebPart1.dll'
 web_path = "/one"
 
 [web_part.two]
-assembly_path = '..\..\..\..\TestWebPart2\bin\Debug\net8.0\TestWebPart2.dll'
+assembly_path = '..\..\..\..\TestWebPart2\bin\Debug\net10.0\TestWebPart2.dll'
 web_path = "/two"
 type_full_name = "WebPart2"
 property_name = "app"
@@ -107,7 +107,7 @@ A typical `.fsproj` file for a dynamic web part will then look something like th
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
