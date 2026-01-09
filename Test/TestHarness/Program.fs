@@ -1,19 +1,29 @@
 ﻿open Suave
-open Suave.Filters
-open Suave.Logging
 open Suave.Operators
+
+open Serilog
+
+let logRequest (logger : ILogger) : WebPart =
+    fun ctx ->
+        async {
+            logger.Information(
+                "{Method} {Path}", ctx.request.method, ctx.request.path)
+            return Some ctx
+        }
 
 try
 
+    use logger =
+        LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger()
+
     let app =
-        let logger = Targets.create LogLevel.Info [||]
-        choose [
-            Dynamic.WebPart.fromToml "WebParts.toml"
-            RequestErrors.NOT_FOUND "Found no handlers."
-        ] >=> logWithLevelStructured
-            LogLevel.Info
-            logger
-            logFormatStructured
+        logRequest logger
+            >=> choose [
+                Dynamic.WebPart.fromToml "WebParts.toml"
+                RequestErrors.NOT_FOUND "Found no handlers."
+            ]
 
     startWebServer defaultConfig app
 

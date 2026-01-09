@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Suave" Version="2.6.2" />
+    <PackageReference Include="Suave" Version="3.2.1" />
     <PackageReference Include="Tommy" Version="3.1.2" />
   </ItemGroup>
 
