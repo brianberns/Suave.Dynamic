@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/brianberns/Suave.Dynamic</RepositoryUrl>
     <PackageTags>Suave; dynamic</PackageTags>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-    <Version>1.5</Version>
+    <Version>1.6</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Suave" Version="3.2.1" />
+    <PackageReference Include="Suave" Version="3.2.3" />
     <PackageReference Include="Tommy" Version="3.1.2" />
   </ItemGroup>
 
