@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Suave.Dynamic/Suave.Dynamic.fsproj" />
+  <Project Path="Test/TestHarness/TestHarness.fsproj" />
+  <Project Path="Test/TestWebPart1/TestWebPart1.fsproj" />
+  <Project Path="Test/TestWebPart2/TestWebPart2.fsproj" />
+</Solution>
